@@ -1,0 +1,26 @@
+[
+{
+  "model": "chat.room",
+  "pk": 1,
+  "fields": {
+    "name": "general_chat",
+    "is_private": false,
+    "created_at": "2024-11-15T08:17:25.735Z",
+    "users": [
+      3
+    ]
+  }
+},
+{
+  "model": "chat.room",
+  "pk": 2,
+  "fields": {
+    "name": "private_chanel_1",
+    "is_private": true,
+    "created_at": "2024-11-15T08:19:47.329Z",
+    "users": [
+      3
+    ]
+  }
+}
+]
