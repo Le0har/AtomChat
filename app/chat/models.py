@@ -19,8 +19,8 @@ class Room(models.Model):
 class Message(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    room = models.ForeignKey(to=Room, on_delete=models.CASCADE, related_name='room')
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='user')
+    room = models.ForeignKey(to=Room, on_delete=models.CASCADE, related_name='messages')
+    author = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True, related_name='messages')
 
     def __str__(self):
         return self.text
