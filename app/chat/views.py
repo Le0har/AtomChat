@@ -17,11 +17,17 @@ class RoomViewSet(viewsets.ModelViewSet):
 class RoomMessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer  
 
-    def get_queryset(self):
+    def _get_room(self):
         room_id = self.kwargs['room_id']
-        room = get_object_or_404(Room, pk=room_id)
-        queryset = room.messages
-        return queryset
+        return get_object_or_404(Room, pk=room_id)
+
+    def get_queryset(self):
+        room = self._get_room()
+        return room.messages
+    
+    def perform_create(self, serializer):
+        room = self._get_room()
+        serializer.save(room=room)
 
 
 
