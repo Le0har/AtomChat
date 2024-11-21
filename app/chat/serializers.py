@@ -17,7 +17,7 @@ class MessageOneToOneSerializer(MessageSerializer):
     user_to = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
 
     class Meta(MessageSerializer.Meta):
-        fields = ('text', 'created_at', 'author', 'user_to') 
+        fields = ('text', 'created_at', 'user_to') 
  
     def create(self, validated_data):
         user_to = validated_data.pop('user_to')
@@ -33,12 +33,10 @@ class MessageOneToOneSerializer(MessageSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'is_private', 'created_at', 'users')
+        fields = ('id', 'name', 'is_private', 'created_at')
         read_only_fields = ['is_private', 'created_at']
 
-    # def create(self, validated_data):
-    #     if 'users' in validated_data:
-    #         validated_data['users'] += self.request.user
-    #     else:
-    #         validated_data['users'] = self.request.user
-    #     return super().create(validated_data)    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['users'] = (request._user, )
+        return super().create(validated_data)    
