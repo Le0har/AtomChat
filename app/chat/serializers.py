@@ -35,3 +35,10 @@ class RoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = ('id', 'name', 'is_private', 'created_at', 'users')
         read_only_fields = ['is_private', 'created_at']
+
+    # def create(self, validated_data):
+    #     if 'users' in validated_data:
+    #         validated_data['users'] += self.request.user
+    #     else:
+    #         validated_data['users'] = self.request.user
+    #     return super().create(validated_data)    

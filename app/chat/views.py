@@ -8,10 +8,20 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all() 
     serializer_class = MessageOneToOneSerializer 
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all() 
     serializer_class = RoomSerializer 
+
+    # def perform_create(self, serializer):
+    #     print('Зашли в метод!')
+    #     author_room = self.request.user
+    #     self.users.set((author_room, ))
+    #     users = [2, 3]
+    #     serializer.save(users=users)  
 
 
 class RoomMessageViewSet(viewsets.ModelViewSet):
