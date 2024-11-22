@@ -1,6 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from chat.models import Message, Room
+from django.db import IntegrityError, transaction
+from rest_framework.settings import api_settings
+from django.contrib.auth.password_validation import validate_password
+from django.core import exceptions as django_exceptions
 
 
 User = get_user_model()
@@ -9,8 +13,8 @@ User = get_user_model()
 class MessageSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Message
-        fields = ('text', 'created_at', 'author') 
-        read_only_fields = ['created_at']
+        fields = ('text', 'created_at') 
+        read_only_fields = ['created_at', 'author']
 
 
 class MessageOneToOneSerializer(MessageSerializer): 
@@ -42,4 +46,47 @@ class RoomSerializer(serializers.ModelSerializer):
             validated_data['users'] = (request._data['users'], ) + (request._user, )
         else:
             validated_data['users'] = (request._user, )
-        return super().create(validated_data)    
+        return super().create(validated_data) 
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        request = self.context.get('request')
+        if 'users' in request._data:
+            new_users = ((*request._data['users'], ) + (request._user.id, ))
+            instance.users.set(new_users)
+        instance.save()
+        return instance 
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    ''' Created based on Djoser and simplified '''
+    
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
+    default_error_messages = {"error_create": "Can't create user"}
+
+    class Meta:
+        model = User
+        fields = tuple(User.REQUIRED_FIELDS) + ("username", "password")
+
+    def validate(self, attrs):
+        user = User(**attrs)
+        password = attrs.get("password")
+        try:
+            validate_password(password, user)
+        except django_exceptions.ValidationError as e:
+            serializer_error = serializers.as_serializer_error(e)
+            raise serializers.ValidationError(
+                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]})
+        return attrs
+
+    def create(self, validated_data):
+        try:
+            user = self.perform_create(validated_data)
+        except IntegrityError:
+            self.fail("error_create")
+        return user
+
+    def perform_create(self, validated_data):
+        with transaction.atomic():
+            user = User.objects.create_user(**validated_data)
+        return user
