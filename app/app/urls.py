@@ -9,5 +9,6 @@ urlpatterns = [
     path('api/messages/', views.MessageViewSet.as_view({'post': 'create'})),
     path('api/rooms/', views.RoomViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('api/rooms/<int:room_id>/messages/', views.RoomMessageViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('api-token-auth/', obtain_auth_token)
+    path('api-token-auth/', obtain_auth_token),
+    path('api/rooms/<int:room_id>/', views.RoomViewSet.as_view({'put': 'update'})),
 ]

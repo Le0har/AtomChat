@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from chat.models import Message, Room
 from chat.serializers import MessageOneToOneSerializer, RoomSerializer, MessageSerializer
+from rest_framework.permissions import IsAuthenticated
+from chat.permissions import IsRoomUser
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -15,6 +17,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all() 
     serializer_class = RoomSerializer 
+    permission_classes = (IsAuthenticated, IsRoomUser)
 
 
 class RoomMessageViewSet(viewsets.ModelViewSet):

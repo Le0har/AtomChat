@@ -38,5 +38,8 @@ class RoomSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        validated_data['users'] = (request._user, )
+        if 'users' in request._data:
+            validated_data['users'] = (request._data['users'], ) + (request._user, )
+        else:
+            validated_data['users'] = (request._user, )
         return super().create(validated_data)    
