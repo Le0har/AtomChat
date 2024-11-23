@@ -13,7 +13,7 @@ User = get_user_model()
 class MessageSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Message
-        fields = ('text', 'created_at') 
+        fields = ('text', 'created_at', 'author') 
         read_only_fields = ['created_at', 'author']
 
 
@@ -42,17 +42,16 @@ class RoomSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        if 'users' in request._data:
-            validated_data['users'] = (request._data['users'], ) + (request._user, )
-        else:
-            validated_data['users'] = (request._user, )
+        room_users = validated_data.get('users', [])
+        room_users.append(request.user.pk)
+        validated_data['users'] = room_users
         return super().create(validated_data) 
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         request = self.context.get('request')
-        if 'users' in request._data:
-            new_users = ((*request._data['users'], ) + (request._user.id, ))
+        if 'users' in request.data:
+            new_users = ((*request.data['users'], ) + (request.user.id, ))
             instance.users.set(new_users)
         instance.save()
         return instance 

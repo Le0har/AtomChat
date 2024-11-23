@@ -21,6 +21,13 @@ class RoomViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsRoomUser)
     lookup_url_kwarg = 'room_id'
 
+    def get_queryset(self):
+        current_user = self.request.user
+        if current_user.is_staff:
+            return Room.objects.filter(is_private=True)
+        else:
+            return Room.objects.filter(users=current_user)
+
 
 class RoomMessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer 
