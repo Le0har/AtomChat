@@ -18,8 +18,13 @@ class MessageViewSet(viewsets.ModelViewSet):
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all() 
     serializer_class = RoomSerializer 
-    permission_classes = (IsAuthenticated, IsRoomUser)
     lookup_url_kwarg = 'room_id'
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+        if self.detail:
+            permission_classes.append(IsRoomUser)
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         current_user = self.request.user

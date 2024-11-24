@@ -37,24 +37,20 @@ class MessageOneToOneSerializer(MessageSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ('id', 'name', 'is_private', 'created_at')
-        read_only_fields = ['is_private', 'created_at']
+        fields = ('id', 'name', 'is_private', 'created_at', 'users')
+        read_only_fields = ['is_private', 'created_at', 'users']
 
-    def create(self, validated_data):
+    def save(self, **kwargs):
         request = self.context.get('request')
-        room_users = validated_data.get('users', [])
+        room_users = request.data.get('users', [])
         room_users.append(request.user.pk)
-        validated_data['users'] = room_users
-        return super().create(validated_data) 
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        request = self.context.get('request')
-        if 'users' in request.data:
-            new_users = ((*request.data['users'], ) + (request.user.id, ))
-            instance.users.set(new_users)
-        instance.save()
-        return instance 
+        validated_data = {'users': room_users}
+        validated_data.update({**self.validated_data, **kwargs})
+        if self.instance is not None:
+            self.instance = self.update(self.instance, validated_data)
+        else:
+            self.instance = self.create(validated_data)
+        return self.instance
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
