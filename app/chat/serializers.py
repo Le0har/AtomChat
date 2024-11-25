@@ -38,47 +38,42 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ('id', 'name', 'is_private', 'created_at', 'users')
-        read_only_fields = ['is_private', 'created_at', 'users']
+        read_only_fields = ['is_private', 'created_at']
+        extra_kwargs = {'users': {'required': False}}
 
     def save(self, **kwargs):
         request = self.context.get('request')
-        room_users = request.data.get('users', [])
-        room_users.append(request.user.pk)
-        validated_data = {'users': room_users}
-        validated_data.update({**self.validated_data, **kwargs})
-        if self.instance is not None:
-            self.instance = self.update(self.instance, validated_data)
-        else:
-            self.instance = self.create(validated_data)
-        return self.instance
+        self.validated_data.setdefault('users', []) 
+        self.validated_data['users'].append(request.user.pk) 
+        return super().save(**kwargs)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    ''' Created based on Djoser and simplified '''
+    """ Created based on Djoser and simplified. """
     
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
-    default_error_messages = {"error_create": "Can't create user"}
+    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    default_error_messages = {'error_create': 'Can\'t create user!'}
 
     class Meta:
         model = User
-        fields = tuple(User.REQUIRED_FIELDS) + ("username", "password")
+        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password')
 
     def validate(self, attrs):
         user = User(**attrs)
-        password = attrs.get("password")
+        password = attrs.get('password')
         try:
             validate_password(password, user)
         except django_exceptions.ValidationError as e:
             serializer_error = serializers.as_serializer_error(e)
             raise serializers.ValidationError(
-                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]})
+                {'password': serializer_error[api_settings.NON_FIELD_ERRORS_KEY]})
         return attrs
 
     def create(self, validated_data):
         try:
             user = self.perform_create(validated_data)
         except IntegrityError:
-            self.fail("error_create")
+            self.fail('error_create')
         return user
 
     def perform_create(self, validated_data):

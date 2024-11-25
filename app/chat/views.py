@@ -4,7 +4,7 @@ from chat.models import Message, Room
 from chat.serializers import MessageOneToOneSerializer, RoomSerializer, MessageSerializer
 from chat.serializers import UserCreateSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from chat.permissions import IsRoomUser
+from chat.permissions import IsRoomUser, IsAdmin
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -24,14 +24,20 @@ class RoomViewSet(viewsets.ModelViewSet):
         permission_classes = [IsAuthenticated]
         if self.detail:
             permission_classes.append(IsRoomUser)
+            # if self.request.method in ['PUT', 'GET']:
+            #     permission_classes = [(IsAuthenticated & IsRoomUser) | (IsAuthenticated & IsAdmin)]
+            # elif self.request.method == 'DELETE':
+            #     permission_classes = [IsAuthenticated & IsAdmin]
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        current_user = self.request.user
-        if current_user.is_staff:
-            return Room.objects.filter(is_private=True)
-        else:
-            return Room.objects.filter(users=current_user)
+        room_id = self.kwargs.get('room_id', None)
+        if room_id is not None:
+            return Room.objects.filter(pk=room_id)
+        # current_user = self.request.user
+        # if current_user.is_staff:
+        #     return Room.objects.filter(is_private=True)
+        # return Room.objects.filter(users=current_user)
 
 
 class RoomMessageViewSet(viewsets.ModelViewSet):
@@ -53,6 +59,6 @@ class RoomMessageViewSet(viewsets.ModelViewSet):
 
 class UserCreateSet(viewsets.ModelViewSet):
     serializer_class = UserCreateSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
 
