@@ -23,21 +23,18 @@ class RoomViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         permission_classes = [IsAuthenticated]
         if self.detail:
-            permission_classes.append(IsRoomUser)
-            # if self.request.method in ['PUT', 'GET']:
-            #     permission_classes = [(IsAuthenticated & IsRoomUser) | (IsAuthenticated & IsAdmin)]
-            # elif self.request.method == 'DELETE':
-            #     permission_classes = [IsAuthenticated & IsAdmin]
+            #permission_classes.append(IsRoomUser)
+            if self.request.method in ['PUT', 'GET']:
+                permission_classes = [(IsAuthenticated & IsRoomUser) | (IsAuthenticated & IsAdmin)]
+            elif self.request.method == 'DELETE':
+                permission_classes = [IsAuthenticated & IsAdmin]
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
-        room_id = self.kwargs.get('room_id', None)
-        if room_id is not None:
-            return Room.objects.filter(pk=room_id)
-        # current_user = self.request.user
-        # if current_user.is_staff:
-        #     return Room.objects.filter(is_private=True)
-        # return Room.objects.filter(users=current_user)
+        current_user = self.request.user
+        if current_user.is_staff:
+            return Room.objects.filter(is_private=True)
+        return Room.objects.filter(users=current_user)
 
 
 class RoomMessageViewSet(viewsets.ModelViewSet):
