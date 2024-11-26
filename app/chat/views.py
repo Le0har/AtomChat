@@ -24,7 +24,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         permission_classes = [IsAuthenticated]
         if self.detail:
             if self.request.method in ['PUT', 'GET']:
-                permission_classes = [(IsAuthenticated & IsRoomUser) | (IsAuthenticated & IsAdmin)]
+                permission_classes = [IsAuthenticated & (IsRoomUser | IsAdmin)]
             elif self.request.method == 'DELETE':
                 permission_classes = [IsAuthenticated & IsAdmin]
         return [permission() for permission in permission_classes]
@@ -40,7 +40,7 @@ class RoomMessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer 
 
     def get_permissions(self):
-        permission_classes = [(IsAuthenticated & IsRoomUser) | (IsAuthenticated & IsAdmin)]
+        permission_classes = [IsAuthenticated & (IsRoomUser | IsAdmin)]
         return [permission() for permission in permission_classes]   
 
     def _get_room(self):
@@ -65,6 +65,6 @@ class UserBlockSet(viewsets.ModelViewSet):
     queryset = User.objects.all() 
     serializer_class = UserBlockSerializer
     permission_classes = (IsAuthenticated, IsAdmin)
-    lookup_url_kwarg = 'user_id'
+
 
 

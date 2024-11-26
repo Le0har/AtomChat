@@ -9,13 +9,13 @@ router = routers.SimpleRouter()
 router.register('messages', views.MessageViewSet)
 router.register('rooms', views.RoomViewSet)
 router.register(r'rooms/(?P<room_id>\d+)/messages', views.RoomMessageViewSet, basename='roommessage')
+router.register('auth/register', views.UserCreateSet, basename='register')
+router.register('auth/block', views.UserBlockSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api-token-auth/', obtain_auth_token),
-    path('api/auth/register/', views.UserCreateSet.as_view({'post': 'create'})),
-    path('api/auth/block/<int:user_id>/', views.UserBlockSet.as_view({'put': 'update'})),
 ]
 
 
@@ -27,4 +27,5 @@ urlpatterns = [
 #     path('api/rooms/<int:room_id>/messages/', views.RoomMessageViewSet.as_view({'get': 'list', 'post': 'create'})),
 #     path('api-token-auth/', obtain_auth_token),
 #     path('api/auth/register/', views.UserCreateSet.as_view({'post': 'create'})),
+#     path('api/auth/block/<int:user_id>/', views.UserBlockSet.as_view({'put': 'update'})),
 # ]
