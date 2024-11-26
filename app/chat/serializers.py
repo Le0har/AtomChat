@@ -80,3 +80,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
         return user
+
+
+class UserBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'is_active')
+        read_only_fields = ['username']

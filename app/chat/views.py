@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from chat.models import Message, Room
+from chat.models import Message, Room, User
 from chat.serializers import MessageOneToOneSerializer, RoomSerializer, MessageSerializer
-from chat.serializers import UserCreateSerializer
+from chat.serializers import UserCreateSerializer, UserBlockSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from chat.permissions import IsRoomUser, IsAdmin
 
@@ -59,5 +59,12 @@ class RoomMessageViewSet(viewsets.ModelViewSet):
 class UserCreateSet(viewsets.ModelViewSet):
     serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
+
+
+class UserBlockSet(viewsets.ModelViewSet):
+    queryset = User.objects.all() 
+    serializer_class = UserBlockSerializer
+    permission_classes = (IsAuthenticated, IsAdmin)
+    lookup_url_kwarg = 'user_id'
 
 
