@@ -7,7 +7,7 @@ User = get_user_model()
 
 class Room(models.Model):
     name = models.CharField(unique=True)
-    # Flag for private chats (for two) and private chats (?)
+    # Flag for private chats (for two) and private chats (for several)
     is_private = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     users = models.ManyToManyField(to=User, related_name='rooms')

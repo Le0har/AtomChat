@@ -4,11 +4,9 @@ from chat.models import Room
 
 
 class IsRoomUser(permissions.BasePermission):
+
     def has_permission(self, request, view):
         room_id = view.kwargs.get('room_id')
         room = get_object_or_404(Room, pk=room_id)
         return request.user in room.users.all()
     
-class IsAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return bool(request.user and request.user.is_staff)

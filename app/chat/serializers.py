@@ -26,7 +26,7 @@ class MessageOneToOneSerializer(MessageSerializer):
     def create(self, validated_data):
         user_to = validated_data.pop('user_to')
         author = validated_data.get('author')
-        room = Room.objects.filter(users=(author.pk, user_to.pk), is_private=True).first()
+        room = Room.objects.filter(users=author.pk, is_private=True).filter(users=user_to.pk).first()
         if room is None:
             room = Room.objects.create(is_private=True, name=f'{author}&{user_to}_private')
             room.users.set((author, user_to))
@@ -48,7 +48,7 @@ class RoomSerializer(serializers.ModelSerializer):
         return super().save(**kwargs)
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """ Created based on Djoser and simplified. """
     
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -56,7 +56,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password')
+        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password', 'is_active')
+        extra_kwargs = {'is_active': {'required': False}}
 
     def validate(self, attrs):
         user = User(**attrs)
@@ -82,8 +83,3 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserBlockSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'is_active')
-        read_only_fields = ['username']
