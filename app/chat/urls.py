@@ -11,7 +11,7 @@ router.register(r'rooms/(?P<room_id>\d+)/messages', views.RoomMessageViewSet, ba
 router.register('users', views.UserViewSet, basename='users')
 
 auth_patterns = [
-    path('tokens/', obtain_auth_token),
+    path('tokens/', obtain_auth_token, name='get-token'),
 ]
 
 urlpatterns = [

@@ -1,12 +1,13 @@
 from typing import Any
-from django.core.management import BaseCommand
-from chat.serializers import UserCreateSerializer, MessageOneToOneSerializer, RoomSerializer
+from django.core.management import BaseCommand, CommandError
+from chat.models import User, Room, Message
 
 
 class Command(BaseCommand):
     help = 'Creating data for a database'
 
     def handle(self, *args, **options):
+        # Creating users
         users = [
             {
                 'username': 'maksim',
@@ -23,24 +24,32 @@ class Command(BaseCommand):
             }
         ]
         for user in users:
-            serializer = UserCreateSerializer(data=user)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            try:
+                User.objects.create(**user)
+            except:
+                raise CommandError('Can\'t create user!')
 
-        message_one_to_one = {
-            'text': 'Привет, как дела?',
-            'user_to': 38
-        }
-        serializer = MessageOneToOneSerializer(data=message_one_to_one)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # Creating private room for two users
+        maksim = User.objects.get(username='maksim')
+        diana = User.objects.get(username='diana')
+        try:
+                room_private = Room.objects.create(is_private=True, name=f'{maksim}&{diana}_private')
+                room_private.users.set((maksim, diana))
+        except:
+                raise CommandError('Can\'t create private room for two users!')
 
-        common_room = {
-            "name": "Чат о погоде",
-            "users": [38, 39, 40]
-        }
-        serializer = RoomSerializer(data=common_room)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # Creating private room for several users
+        rodion = User.objects.get(username='rodion_admin')
+        try:
+                room_common = Room.objects.create(is_private=True, name='Чат про погоду')
+                room_common.users.set((maksim, diana, rodion))
+        except:
+                raise CommandError('Can\'t create private room for several users!')
 
+        # Creating message in private room for two users
+        try:
+            Message.objects.create(text='Привет, как дела?', author=maksim, room=room_private)
+        except:
+            raise CommandError('Can\'t create message in room!')
+        
         self.stdout.write(self.style.SUCCESS('Database entries have been created successfully!'))

@@ -51,7 +51,13 @@ $ pip install -r requirements.txt
 ```
 $ python manage.py migrate
 ```
-8. Запустить проект
+
+8. Записать данные в БД (опционально)
+```
+$ python manage.py createdata
+```
+
+9. Запустить проект
 ```
 $ python manage.py runserver
 ```
