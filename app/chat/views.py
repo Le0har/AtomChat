@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from chat.models import Message, Room, User
 from chat.serializers import MessageOneToOneSerializer, RoomSerializer, MessageSerializer
-from chat.serializers import UserSerializer
+from chat.serializers import UserCreateSerializer, UserBlockSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.decorators import action
@@ -19,11 +19,7 @@ class MessageViewSet(mixins.CreateModelMixin,
         serializer.save(author=self.request.user)
 
 
-class RoomViewSet(mixins.CreateModelMixin,
-                  mixins.UpdateModelMixin,
-                  mixins.DestroyModelMixin,
-                  mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
+class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all() 
     serializer_class = RoomSerializer 
     lookup_url_kwarg = 'room_id'
@@ -66,24 +62,16 @@ class RoomMessageViewSet(mixins.CreateModelMixin,
 class UserViewSet(mixins.CreateModelMixin,
                   mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
-    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
 
-    @action(detail=True, methods=['put'], permission_classes=[IsAuthenticated, IsAdminUser])
+    @action(detail=True, methods=['put'], permission_classes=[IsAdminUser])
     def block(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
-        data = request.data
-        data['username'] = user.username
-        data['password'] = user.password
-        serializer = UserSerializer(user, data=data)
-        if serializer.is_valid():
-            user.is_active = serializer.validated_data.setdefault('is_active', user.is_active)
-            user.save()
-            return Response({'username': user.username, 'is_active': user.is_active})
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+        instance = self.get_object()
+        serializer = UserBlockSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 

@@ -48,7 +48,7 @@ class RoomSerializer(serializers.ModelSerializer):
         return super().save(**kwargs)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
     """ Created based on Djoser and simplified. """
     
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -56,8 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password', 'is_active')
-        extra_kwargs = {'is_active': {'required': False}}
+        fields = tuple(User.REQUIRED_FIELDS) + ('username', 'password')
 
     def validate(self, attrs):
         user = User(**attrs)
@@ -82,4 +81,10 @@ class UserSerializer(serializers.ModelSerializer):
             user = User.objects.create_user(**validated_data)
         return user
 
+
+class UserBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'is_active')
+        read_only_fields = ['username']
 

@@ -11,7 +11,7 @@ API атом чата, в котором пользователи могут о�
 
 ## Технологии
 
-- python 3.12.3 - высокоуровневый язык программирования общего назначения
+- python 3.10+ - высокоуровневый язык программирования общего назначения
 - django 5.1.3 - фреймворк для веб-приложений на языке Python
 - djangorestframework 3.15.2 - фреймворк для разработки веб-API в приложениях на основе Django
 - psycopg2-binary 2.9.10 - библиотека взаимодействия с СУБД PostgreSQL
@@ -34,7 +34,7 @@ $ source django_venv/bin/activate
 ```
 $ python -m pip install --upgrade pip
 ```
-5. Установить зависимости из requirements.txt
+5. Установить зависимости из ```requirements.txt```
 ```
 $ pip install -r requirements.txt
 ```
@@ -58,7 +58,47 @@ $ python manage.py runserver
 
 ## Примеры запросов
 
-- GET-Response: http://<span></span>127.0.0.1:8000/api/rooms/
+- POST: http://<span></span>127.0.0.1:8000/api/users/
+
+Response:
+
+```J-SON
+{
+  "username": "valentin",
+  "password": "user_val99",
+  "email": "valentin99@ati.hom"
+}
+```
+
+Request:
+
+```J-SON
+{
+  "email": "valentin99@ati.hom",
+  "username": "valentin"
+}
+```
+
+- POST: http://<span></span>127.0.0.1:8000/api/auth/tokens/
+
+Response:
+
+```J-SON
+{
+  "username": "valentin",
+  "password": "user_val99"
+}
+```
+
+Request:
+
+```J-SON
+{
+  "token": "1f3d6a1986645c7338c7cc66c0a615b26bd1e828"
+}
+```
+
+- GET: http://<span></span>127.0.0.1:8000/api/rooms/
 
 Request:
 
@@ -88,7 +128,7 @@ Request:
 ]
 ```
 
-- GET-Response: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
+- GET: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
 
 Request:
 
@@ -107,7 +147,7 @@ Request:
 ]
 ```
 
-- POST-Response: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
+- POST: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
 
 Response:
 
