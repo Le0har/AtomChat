@@ -11,21 +11,32 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Creating users
-        try:
-            maksim, created = User.objects.get_or_create(username='maksim')
-            if created:
-                maksim.set_password('user_maks91')
-                maksim.save()
-            diana, created = User.objects.get_or_create(username='diana')
-            if created:
-                diana.set_password('user_dian92')
-                diana.save()
-            rodion, created = User.objects.get_or_create(username='rodion_admin', is_staff=True)
-            if created:
-                rodion.set_password('moder_rod93')
-                rodion.save()
-        except:
-            raise CommandError('Can\'t create user!')
+        users = [
+            {
+                'username': 'maksim',
+                'defaults': {'password': 'user_maks91'}
+            },
+            {
+                'username': 'diana',
+                'defaults': {'password': 'user_dian92'}
+            },
+            {
+                'username': 'rodion_admin',
+                'defaults': {'password': 'moder_rod93'},
+                'is_staff': True
+            }
+        ]
+        new_users = []
+        for user in users:
+            try:
+                new_user, created = User.objects.get_or_create(**user)
+                if created:
+                    new_user.set_password(user['password'])
+                    new_user.save()
+                new_users.append(new_user)
+            except:
+                raise CommandError('Can\'t create user!')
+        maksim, diana, rodion = new_users
 
         # Creating private room for two users
         try:
