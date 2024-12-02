@@ -1,13 +1,16 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets, mixins
-from chat.models import Message, Room, User
+from chat.models import Message, Room
 from chat.serializers import MessageOneToOneSerializer, RoomSerializer, MessageSerializer
 from chat.serializers import UserCreateSerializer, UserBlockSerializer
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from chat.permissions import IsRoomUser
+
+
+User = get_user_model()
 
 
 class MessageViewSet(mixins.CreateModelMixin,
@@ -60,7 +63,6 @@ class RoomMessageViewSet(mixins.CreateModelMixin,
 
 
 class UserViewSet(mixins.CreateModelMixin,
-                  mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer

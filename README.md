@@ -64,9 +64,9 @@ $ python manage.py runserver
 
 ## Примеры запросов
 
-- POST: http://<span></span>127.0.0.1:8000/api/users/
+- POST: /api/users/
 
-Response:
+Request body:
 
 ```J-SON
 {
@@ -76,7 +76,7 @@ Response:
 }
 ```
 
-Request:
+Response:
 
 ```J-SON
 {
@@ -85,9 +85,9 @@ Request:
 }
 ```
 
-- POST: http://<span></span>127.0.0.1:8000/api/auth/tokens/
+- POST: /api/auth/tokens/
 
-Response:
+Request body:
 
 ```J-SON
 {
@@ -96,7 +96,7 @@ Response:
 }
 ```
 
-Request:
+Response:
 
 ```J-SON
 {
@@ -104,9 +104,9 @@ Request:
 }
 ```
 
-- GET: http://<span></span>127.0.0.1:8000/api/rooms/
+- GET: /api/rooms/
 
-Request:
+Response:
 
 ```J-SON
 [
@@ -134,9 +134,9 @@ Request:
 ]
 ```
 
-- GET: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
+- GET: /api/rooms/17/messages/
 
-Request:
+Response:
 
 ```J-SON
 [
@@ -153,9 +153,9 @@ Request:
 ]
 ```
 
-- POST: http://<span></span>127.0.0.1:8000/api/rooms/17/messages/
+- POST: /api/rooms/17/messages/
 
-Response:
+Request body:
 
 ```J-SON
 {
@@ -163,7 +163,7 @@ Response:
 }
 ```
 
-Request:
+Response:
 
 ```J-SON
 [
